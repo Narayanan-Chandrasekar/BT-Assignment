@@ -1,1 +1,15 @@
 This is the first commit for Employee training system.
+
+Brief about what I have done:
+Trainer registers and logs in.
+He can add, edit and cancel(if there are not any bookings against his/her module) his/her training module.
+He can view his trainings
+He can view the reservations on his trainings
+I have also added search by topic feature to search trainer's  training modules.
+
+Employee registers and logs in.
+He can search by topic all training modules posted by all trainers.
+He can book a seat and cancel a seat against a training module.
+He can view his trainings
+
+

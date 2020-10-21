@@ -1,0 +1,652 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets%}
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous"> 
+<link rel="stylesheet" href="/assets/css/home.css">
+
+{% endblock %}
+{% block body%}
+
+    <div class="container-fluid display-table">
+        <div class="row display-table-row">
+            <div class="col-md-2 col-sm-1 hidden-xs display-table-cell v-align box" id="navigation"  style="width:auto">
+                
+                <div class="navi">
+                    <ul>
+                        <li class="active"><a href="#" onclick = "return home();"><i class="fa fa-home" aria-hidden="true"></i><span class="hidden-xs hidden-sm">Home</span></a></li>
+                        
+                        <li id="my-trainings"><a href="#" {% if isAdmin%} onclick = "return training();" {% else %} onclick = "return bookedTraining();" {% endif %}><i class="fa fa-tasks" aria-hidden="true"></i><span class="hidden-xs hidden-sm">My Trainings</span></a></li>
+                        {% if isAdmin %}
+                        <li><a href="#" onclick = "return reservation();"><i class="fa fa-bar-chart" aria-hidden="true"></i><span class="hidden-xs hidden-sm">View Reservations</span></a></li>
+                        <li><a href="#" onclick = "return trainingForm();"><i class="fa fa-user" aria-hidden="true"></i><span class="hidden-xs hidden-sm">Add New Training</span></a></li>
+                        {% else %}
+                        <li><a href="#" onclick = "return upcomingReservation();"><i class="fa fa-bar-chart" aria-hidden="true"></i><span class="hidden-xs hidden-sm">View Upcoming Reservations</span></a></li>
+                        {% endif %}
+                        <!--<li><a href="#"><i class="fa fa-calendar" aria-hidden="true"></i><span class="hidden-xs hidden-sm">Users</span></a></li>-->
+                        <li><a href="{{ path('logout',{id:id}) }}"><i class="fa fa-cog" aria-hidden="true"></i><span class="hidden-xs hidden-sm">Logout</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-10 col-sm-11 display-table-cell v-align">
+                <!--<button type="button" class="slide-toggle">Slide Toggle</button> -->
+                <div class="row">
+                    <header>
+                        <div class="col-md-7">
+                            <nav class="navbar-default pull-left">
+                                <div class="navbar-header">
+                                    <button type="button" class="navbar-toggle collapsed" data-toggle="offcanvas" data-target="#side-menu" aria-expanded="false">
+                                        <span class="sr-only">Toggle navigation</span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </button>
+                                </div>
+                            </nav>
+                            <div class="search hidden-xs hidden-sm">
+                                <form id="search-form">
+                                <input type="text" placeholder="Search by Topic" id="search"  onkeyup="return searchByTopic()">
+                                </form>
+                            </div>
+                            
+                        </div>
+                        
+                    </header>
+                </div>
+                <div class="user-dashboard">
+                    <h1>Hello, {{ email }}</h1>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-xs-12 gutter">
+                        <div class="home col-md-4"></div>
+                        <div id="add-training" class="add-training d-none">
+                            <div class="col-md-12">
+                                    <form name="training-form" id="training-form">
+                                        <div class="form-group">
+                                            <input type="hidden" name="trainingId" id="trainingId" />
+                                            <input id="topic" type="text" name="topic" class="form-control" placeholder="Topic *" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <textarea id="description" rows="4" cols="50" type="text" name="description" class="form-control" placeholder="Description *"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <input id="start" type="date" name="start" class="form-control" placeholder="Start *" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <input id="end" type="date" name="end" class="form-control" placeholder="End *" required/>
+                                        </div>
+                                        <div class="form-group">
+                                            <input id="duration" type="number" name="duration" class="form-control" placeholder="Duration *" required/>
+                                        </div>
+                                        <div class="form-group">
+                                            <input id="seats" type="number" name="seats" class="form-control" placeholder="Seats Available *" required/>
+                                        </div>
+                                     
+                                        <div id="addTraining" class="form-group">
+                                            <input type="submit" name="addTraining" class="btnContactSubmit" value="Add" />
+                                        </div>
+                                        <div id="editTraining" class="form-group d-none">
+                                            <input type="submit" name="editTraining" class="btnContactSubmit" value="Edit" />
+                                        </div>
+                                    </form>
+                            </div>
+                        </div>    
+                            <!--My data should go here-->
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- Modal -->
+    <div class="modal" id="viewDetails">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title"></h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+
+ {% endblock %}
+  {% block javascripts %}
+   <script src="/assets/js/home.js"></script>
+   <script>
+   $(document).ready(function(){
+
+       $(document).on("keydown", "#search-form", function(event) { return event. key != "Enter"; });
+
+       var submitActors = $('#training-form').find('input[type="submit"]');
+       console.log(submitActors);
+       var submitActor = null;
+
+       submitActors.click(function(event) {
+            console.log(this);
+          submitActor = this;
+      });
+       $("#training-form").submit(function(e){
+           e.preventDefault();
+           if(submitActor.value == 'Add')
+           {
+               var url = "{{ path('addTraining',{id:id})|escape('js') }}";
+           } else if(submitActor.value == 'Edit')
+           {
+               url = "{{ path('editTraining',{id:id})|escape('js') }}";  
+           }
+           //alert(url);
+    var form = document.querySelector('#training-form'); 
+    var data = $('#training-form').serialize();
+    $.ajax({
+  type: "POST",
+  url: url,
+  data: {data: data},
+  dataType: 'json',
+  success: function(data){
+      
+      $("#add-training").addClass("d-none");
+      $(".home").html("<h1>"+data["data"]+"</h1><div id='newTrainingId' class='d-none id'>" + data["id"] + "</div>");
+      
+      //alert(data["data"]);
+  },
+  error: function(err){
+      alert(err);
+  }
+  
+});
+
+      });
+
+
+
+   });
+   
+   </script>
+   <script>
+   function searchByTopic()
+   {
+       if($("#search").val().length < 3)
+       {
+           return false;
+       }
+       {% if isAdmin %}
+       var url = "{{ path('searchTraining',{id:id})|escape('js') }}";
+       {% else %}
+       var url = "{{ path('searchAllTraining', {id:id})|escape('js') }}";
+       {% endif %}
+       $.ajax({
+  type: "POST",
+  url: url,
+  data : {'q': $("#search").val()},
+  dataType: 'json',
+  success: function(data){
+       $(".home").html('');
+       $(".home").addClass('container');
+       if(data && data.length)
+       { 
+       data.forEach((items) =>{
+           
+           var card =   '<div class="card" style="width:400px"><div class="card-body">';
+          
+           card +=   '<h4 class="card-title">'+items[2]+'</h4><p class="card-text">'+items[3]+
+           '</p><p class="card-text">StartDate: '+items[4]+
+           '</p><p class="card-text">EndDate: '+items[5]+
+           '</p><p class="card-text">Duration in hours: '+items[6]+
+           '</p><p class="card-text">Seats: '+items[7]+
+           '</p>';
+            var link = '<a href="{{ path('viewTraining',{id: 'trainingId'})|escape('js') }}"'+
+                       'class="btn btn-primary" data-toggle="modal" data-target="#viewDetails" onclick="return display(title, description, start, end, duration, seats);">View Details</a>';
+            link = link.replace('trainingId',items[0]);
+            link = link.replace('title',"'" + items[2] + "'");
+            link = link.replace('description',"'" + items[3] + "'");
+            link = link.replace('start',"'" + items[4] + "'");
+            link = link.replace('end',"'" + items[5] + "'");
+            link = link.replace('duration',"'" + items[6] + "'");
+            link = link.replace('seats',"'" + items[7] + "'");
+            card+= link;           
+            card += '&nbsp;&nbsp;&nbsp;';
+            link2='';
+            {% if isAdmin %}
+            link2 = '<a href="#" class="btn btn-primary" onclick="return editTraining(trainingId);">Edit</a>'+
+                                 '&nbsp;&nbsp;&nbsp;' +'<a href="#" class="btn btn-primary" onclick="return cancelTraining(trainingId);">Cancel</a>'
+            link2 = link2.replaceAll('trainingId', items[0]);
+            {% else %}
+            if(items[7] > 0)
+            {
+                var endDate = new Date(items[5]);
+                if(new Date().getTime() > endDate.getTime())
+                {
+
+                } else {
+                    link2 += '<a href="#" class="btn btn-primary" onclick="return bookTraining(trainingId, {{ id }});">Book a Seat</a>'+
+                        '&nbsp;&nbsp;&nbsp;';
+                }
+              
+            } else {
+                link2 += '&nbsp;&nbsp;&nbsp;' +'<a href="#" class="btn btn-primary" onclick="return cancelBooking(trainingId, {{ id }});">Cancel</a>'    
+            }
+            
+            link2 = link2.replaceAll('trainingId', items[0]);
+            
+            {% endif %}
+            card += link2;
+          card +='</div></div>';
+          $(".home").append(card);
+          card = '';  
+      });
+       } else {
+           {% if isAdmin %} 
+           $(".home").append('<h3>No Training Module found.</h3>');
+           {% else %}
+           $(".home").append('<h3>No Unreserved Training Module found.</h3>'); 
+           {% endif %}
+       }
+  },
+  error: function(err){
+      console.log(err);
+  }
+  
+});
+   }
+   </script>
+   <script>
+function home()
+{
+    $("#add-training").addClass('d-none');
+    const url = "{{ path('home', {'id': id})|escape('js') }}";
+    $.ajax({
+  type: "POST",
+  url: url,
+  data: {section: 'home'},
+  success: function(data){
+      $(".home").html("<h1>"+data["data"]+"</h1>");
+      //alert(data["data"]);
+  }
+  
+});
+
+return false;
+}
+</script>
+<script>
+function training()
+{
+    $("#add-training").addClass('d-none');
+    $(".home").html('');
+    const url = "{{ path('training',{id: id})|escape('js') }}";
+    
+    $.ajax({
+  type: "POST",
+  url: url,
+  data: {section: 'training'},
+  success: function(data){
+      if(data && data.length)
+      {
+      data.forEach((items) =>{
+          var card =   '<div class="card" style="width:400px"><div class="card-body">';
+          
+           card +=   '<h4 class="card-title">'+items[2]+'</h4><p class="card-text">'+items[3]+
+           '</p><p class="card-text">StartDate: '+items[4]+
+           '</p><p class="card-text">EndDate: '+items[5]+
+           '</p><p class="card-text">Duration in hours: '+items[6]+
+           '</p><p class="card-text">Seats: '+items[7]+
+           '</p>';
+            var link = '<a href="{{ path('viewTraining',{id: 'trainingId'})|escape('js') }}"'+
+                       'class="btn btn-primary" data-toggle="modal" data-target="#viewDetails" onclick="return display(title, description, start, end, duration, seats);">View Details</a>';
+            link = link.replace('trainingId',items[0]);
+            link = link.replace('title',"'" + items[2] + "'");
+            link = link.replace('description',"'" + items[3] + "'");
+            link = link.replace('start',"'" + items[4] + "'");
+            link = link.replace('end',"'" + items[5] + "'");
+            link = link.replace('duration',"'" + items[6] + "'");
+            link = link.replace('seats',"'" + items[7] + "'");
+            card+= link;           
+            card += '&nbsp;&nbsp;&nbsp;';
+            {% if isAdmin %}
+            link2 = '<a href="#" class="btn btn-primary" onclick="return editTraining(trainingId);">Edit</a>'+
+                                 '&nbsp;&nbsp;&nbsp;' +'<a href="#" class="btn btn-primary" onclick="return cancelTraining(trainingId);">Cancel</a>'
+            link2 = link2.replaceAll('trainingId', items[0]);
+            
+            {% else %}
+            if(items[8] > 0 || items[8] == null)
+            {
+                link2 = '<a href="#" class="btn btn-primary" onclick="return bookTraining(trainingId, {{ id }});">Book a Seat</a>' +
+                        '&nbsp;&nbsp;&nbsp;' +'<a href="#" class="btn btn-primary" onclick="return cancelBooking(trainingId, {{ id }});">Cancel</a>';
+            } else {
+                link2 = '&nbsp;&nbsp;&nbsp;' +'<a href="#" class="btn btn-primary" onclick="return cancelBooking(trainingId, {{ id }});">Cancel</a>'
+            }
+            
+            link2 = link2.replaceAll('trainingId', items[0]);
+            
+            {% endif %}
+            card += link2;
+          card +='</div></div>';
+          $(".home").append(card);
+          card = '';  
+      });
+      
+     } else {
+         $(".home").append('<h3>No training modules have been created yet.</h3>');
+     }
+  }
+  
+});
+
+return false;
+}
+</script>
+<script>
+function bookedTraining()
+{
+    $("#add-training").addClass('d-none');
+    $(".home").html('');
+    const url = "{{ path('bookedTraining',{userId: id})|escape('js') }}";
+    
+    $.ajax({
+  type: "POST",
+  url: url,
+  data: {section: 'training'},
+  success: function(data){
+      if(data && data.length)
+      {
+      data.forEach((items) =>{
+          var card =   '<div class="card" style="width:400px"><div class="card-body">';
+          
+           card +=   '<h4 class="card-title">'+items[2]+'</h4><p class="card-text">'+items[3]+
+           '</p><p class="card-text">StartDate: '+items[4]+
+           '</p><p class="card-text">EndDate: '+items[5]+
+           '</p><p class="card-text">Duration in hours: '+items[6]+
+           '</p><p class="card-text">Seats: '+items[7]+
+           '</p>';
+            var link = '<a href="{{ path('viewTraining',{id: 'trainingId'})|escape('js') }}"'+
+                       'class="btn btn-primary" data-toggle="modal" data-target="#viewDetails" onclick="return display(title, description, start, end, duration, seats);">View Details</a>';
+            link = link.replace('trainingId',items[0]);
+            link = link.replace('title',"'" + items[2] + "'");
+            link = link.replace('description',"'" + items[3] + "'");
+            link = link.replace('start',"'" + items[4] + "'");
+            link = link.replace('end',"'" + items[5] + "'");
+            link = link.replace('duration',"'" + items[6] + "'");
+            link = link.replace('seats',"'" + items[7] + "'");
+            card+= link;           
+            card += '&nbsp;&nbsp;&nbsp;';
+            link2 = '<a href="#" class="btn btn-primary" onclick="return cancelBooking(trainingId, {{ id }});">Cancel</a>'
+            link2 = link2.replaceAll('trainingId', items[0]);
+            
+            card += link2;
+          card +='</div></div>';
+          $(".home").append(card);
+          card = '';  
+      });
+      
+     } else {
+         $(".home").append('<h3>No training modules have been created yet.</h3>');
+     }
+  }
+  
+});
+
+return false;
+}
+</script>
+<script>
+function display(title,description, start, end, duration, seats)
+{
+    
+    $("#add-training").addClass('d-none');
+    $("#viewDetails .modal-title").html(title);
+    $("#viewDetails .modal-body").html(
+                                        '<h3>'+description+'</h3>'+
+                                        '<h6>The course starts on ' + new Date(start).toString() + '</h6>' +
+                                        '<h6>The course ends on ' + new Date(end).toString() + '</h6>' +
+                                        '<h5>The duration of the course is ' + duration + ' hours</h5>' +
+                                        '<h5>The seats are limited to ' + seats +'</h5>'
+                                      );
+}
+</script>
+<script>
+function editTraining(trainingId)
+{
+    $('.home').html('');
+    $('#add-training').removeClass('d-none');
+    var url = "{{ path('viewTraining',{id: 'trainingId'})|escape('js') }}";
+    url = url.replace('trainingId',trainingId);
+    
+    $.ajax({
+  type: "POST",
+  url: url,
+  data: {section: 'training'},
+  success: function(data){
+      data.forEach((items) =>{
+          $('#trainingId').val(items[0]);
+          $('#topic').val(items[2]);
+          $('#description').val(items[3]);
+          $('#start').val(items[4]);
+          $('#end').val(items[5]);  
+          $('#duration').val(items[6]);  
+          $('#seats').val(items[7]);
+          $('#addTraining').addClass('d-none');
+          $('#editTraining').removeClass('d-none');
+  });     
+}
+    });
+}
+</script>
+<script>
+function cancelTraining(trainingId)
+{
+    if(confirm("Are you sure?"))
+    {
+    $('.home').html('');
+    
+    var url = "{{ path('deleteTraining',{id: 'trainingId'})|escape('js') }}";
+    url = url.replace('trainingId',trainingId);
+    
+    $.ajax({
+  type: "DELETE",
+  url: url,
+  data: {section: 'training'},
+  success: function(data){
+          $('.home').html('<h1>'+data["data"]+'</h1>');
+}
+    });
+}
+}
+</script>
+<script>
+function reservation()
+{   $(".home").html('');
+    $("#add-training").addClass('d-none');
+    const url = "{{ path('reservation',{id: id})|escape('js') }}";
+    $.ajax({
+  type: "POST",
+  url: url,
+  data: {section: 'reservation'},
+  success: function(data){
+     if(data && data.length)
+      {
+      data.forEach((items) =>{
+          var card =   '<div class="card" style="width:400px"><div class="card-body">';
+          console.log(items);
+           card +=   '<h4 class="card-title">Reservations</h4><p class="card-text">Employee: '+items[0]+
+           '</p><p class="card-text">Training Topic: '+items[1]+
+           
+           '</p>';
+           
+          card +='</div></div>';
+          $(".home").append(card);
+          card = '';  
+      });
+      
+     } else {
+         $(".home").append('<h3> + data["data"] +</h3>');
+     }
+
+
+  }
+  
+});
+
+return false;
+}
+</script>
+<script>
+function trainingForm()
+{
+    $("#add-training").removeClass('d-none');
+    $(".home").html('');
+    $('#trainingId').val('');
+          $('#topic').val('');
+          $('#description').val('');
+          $('#start').val('');
+          $('#end').val('');  
+          $('#duration').val('');  
+          $('#seats').val('');
+          $('#addTraining').removeClass('d-none');
+          $('#editTraining').addClass('d-none');
+}
+</script>
+<script>
+function logout()
+{
+    var email = "{{email}}";
+    $(".home").html('');
+    $("#add-training").addClass('d-none');
+    const url = "{{ path('logout',{id: id})|escape('js') }}";
+    $.ajax({
+  type: "POST",
+  url: url,
+  data: {data : email},
+  success: function(data){
+      $(".home").html("<h1>"+data["data"]+"</h1>");
+
+      //alert(data["data"]);
+  }
+  
+});
+
+return false;
+}
+</script>
+<script>
+function bookTraining(trainingId, userId)
+{  // alert(trainingId);alert(userId);
+    var email = "{{email}}";
+    $(".home").html('');
+    $("#add-training").addClass('d-none');
+    var url = "{{ path('bookTraining',{id: 'trainingId', userId: 'userId'})|escape('js') }}";
+    url = url.replace('trainingId',trainingId);
+    url = url.replace('userId',userId);
+    //alert(url);
+    $.ajax({
+  type: "POST",
+  url: url,
+  data: {data : 1},
+  success: function(data){
+      $(".home").html("<h1>"+data["data"]+"</h1>");
+
+  }
+  
+});
+
+return false;
+}
+</script>
+
+<script>
+function upcomingReservation()
+{  // alert(trainingId);alert(userId);
+    var email = "{{email}}";
+    $(".home").html('');
+    $("#add-training").addClass('d-none');
+    var url = "{{ path('upcomingReservation',{userId: id})|escape('js') }}";
+    
+    $.ajax({
+  type: "POST",
+  url: url,
+  data: {data : 1},
+  success: function(data){
+     if(data && data.length)
+      {
+      data.forEach((items) =>{
+          var card =   '<div class="card" style="width:400px"><div class="card-body">';
+          
+           card +=   '<h4 class="card-title">'+items[2]+'</h4><p class="card-text">'+items[3]+
+           '</p><p class="card-text">StartDate: '+items[4]+
+           '</p><p class="card-text">EndDate: '+items[5]+
+           '</p><p class="card-text">Duration in hours: '+items[6]+
+           '</p><p class="card-text">Seats: '+items[7]+
+           '</p>';
+            var link = '<a href="{{ path('viewTraining',{id: 'trainingId'})|escape('js') }}"'+
+                       'class="btn btn-primary" data-toggle="modal" data-target="#viewDetails" onclick="return display(title, description, start, end, duration, seats);">View Details</a>';
+            link = link.replace('trainingId',items[0]);
+            link = link.replace('title',"'" + items[2] + "'");
+            link = link.replace('description',"'" + items[3] + "'");
+            link = link.replace('start',"'" + items[4] + "'");
+            link = link.replace('end',"'" + items[5] + "'");
+            link = link.replace('duration',"'" + items[6] + "'");
+            link = link.replace('seats',"'" + items[7] + "'");
+            card+= link;           
+            card += '&nbsp;&nbsp;&nbsp;';
+            link2 = '<a href="#" class="btn btn-primary" onclick="return cancelBooking(trainingId, {{ id }});">Cancel</a>'
+            link2 = link2.replaceAll('trainingId', items[0]);
+            
+            card += link2;
+          card +='</div></div>';
+          $(".home").append(card);
+          card = '';  
+      });
+      
+     } else {
+         $(".home").append('<h3>No upcoming training modules have been created yet.</h3>');
+     }
+
+  }
+  
+});
+
+return false;
+}
+</script>
+<script>
+function cancelBooking(trainingId, userId)
+{  // alert(trainingId);alert(userId);
+    var email = "{{email}}";
+    $(".home").html('');
+    $("#add-training").addClass('d-none');
+    var url = "{{ path('cancelReservation',{trainingId:'trainingId', userId: 'userId'})|escape('js') }}";
+    url = url.replace('trainingId',trainingId);
+    url = url.replace('userId',userId);
+    $.ajax({
+  type: "DELETE",
+  url: url,
+  data: {data : 1},
+  success: function(data){
+         $(".home").append('<h3>'+ data["data"]+'</h3>');
+     
+
+  }
+  
+});
+
+return false;
+}
+</script>
+  {% endblock %}

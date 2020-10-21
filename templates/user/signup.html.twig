@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets%}
+
+ <link rel="stylesheet" href="/assets/css/signup.css" />
+{% endblock %}
+{% block body%}
+<div class="container register">
+                <div class="row">
+                    <div class="col-md-3 register-left">
+                        <img src="https://image.ibb.co/n7oTvU/logo_white.png" alt=""/>
+                        <h3>Welcome</h3>
+                        <p>You are 30 seconds away from upskilling!</p>
+                        <form action="{{ path('login') }}" method ="post">
+                        {% if err is defined and err.userNotValid is defined %}
+                            {{ err.userNotValid }}
+                        {% endif %}
+                        <input type="submit" name="" value="Login"/><br/>
+                        </form>
+                    </div>
+                    <div class="col-md-9 register-right">
+                        <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Employee</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Trainer</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                <h3 class="register-heading">Apply as a Employee</h3>
+                                <form action="{{ path('signup') }}" method ="post">
+                                <div class="row register-form">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="email" name="email" class="form-control" placeholder="Your Email *" />
+                                            {% if err is defined and  err.inUse is defined %}
+                                            {{ err.inUse }}
+                                            {% endif %}
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="password" name="password" class="form-control" placeholder="Password *"  />
+                                        </div>
+                                        <input type="submit" class="btnRegister"  value="Register"/>
+                                    </div>
+                                </div>
+                                </form>
+                                 <div>
+                                    <div style="position:absolute;right:200px;">
+                        
+                                <form action="{{ path('login') }}" method ="post">
+                        {% if err is defined and err.userNotValid is defined %}
+                            {{ err.userNotValid }}
+                        {% endif %}
+                        <p style="color:blue">If you are already a member, please login below.</p>
+                        <input type="submit" name="" value="Login" style="position:absolute;right:85px;margin-top:0;" class="btnRegister"/><br/>
+                        </form>
+                        </div>
+                       </div>
+                            </div>
+                            <div class="tab-pane fade show" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                                <h3  class="register-heading">Apply as a Trainer</h3>
+                                <form action="{{ path('signup') }}" method ="post">
+                                <input type="hidden" name="trainer" value="1" />
+                                <div class="row register-form">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="email" name="email" class="form-control" placeholder="Email *"/>
+                                        </div>
+                                        
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="password" name="password" class="form-control" placeholder="Password *"/>
+                                        </div>
+                                        <input type="submit" class="btnRegister"  value="Register"/>
+                                    </div>
+                                </div>
+                                </form>
+                                       <div>
+                                    <div style="position:absolute;right:200px;">
+                        
+                                <form action="{{ path('login') }}" method ="post">
+                        {% if err is defined and err.userNotValid is defined %}
+                            {{ err.userNotValid }}
+                        {% endif %}
+                        <p style="color:blue">If you are already a member, please login below.</p>
+                        <input type="submit" name="" value="Login" style="position:absolute;right:85px;margin-top:0;" class="btnRegister"/><br/>
+                        </form>
+                        </div>
+                       </div>
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            {% endblock %}
